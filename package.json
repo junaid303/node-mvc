@@ -1,0 +1,19 @@
+{
+  "name": "mvc-pattern",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "PORT=8888 nodemon server.js",
+    "prod": "PORT=1234 node server.js"
+    
+  },
+  
+  "type":"module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
