@@ -1,9 +1,19 @@
 import http from "http";
+import https from "https";
 import url from "url";
+import fs from "fs";
 
-const port = process.env.PORT || 8888;
+const httpPort = process.env.PORT || 1234;
+const httpsPort = 443;
 
-const server = http.createServer(async (req, res) => {
+
+const SSLOptions = {
+    key: fs.readFileSync("utils/ssl-keys/private-key.pem"),
+    cert: fs.readFileSync("utils/ssl-keys/certificate.pem")
+}
+
+
+const httpServer = http.createServer(async (req, res) => {
     try {
         const parsedURL = url.parse(req.url, true);
         const queryParams = parsedURL.query;
@@ -14,7 +24,6 @@ const server = http.createServer(async (req, res) => {
             if (userRouter[method][routeName]) {
                 req.body = await bodyParser(req);
                 userRouter[method][routeName](req, res);
-
             } else {
                 res.writeHead(404, { 'Content-Type': 'text/html' });
                 res.end("<h1> Not Found </h1>");
@@ -28,6 +37,11 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(500, { 'Content-Type': 'text/html' });
         res.end("<h1> Internal Server Error. Try Again </h1>");
     }
+});
+
+const httpsServer = https.createServer(SSLOptions, (req, res) => {
+    res.writeHead(200, { 'Content-Type': "text/html" });
+    res.end("Hello All, this is HTTPS Server. Traffic is now encrypted.");
 });
 
 async function bodyParser(req) {
@@ -98,9 +112,14 @@ const userRouter = {
     }
 }
 
-server.listen(port, () => {
-    console.log(`Server started at ${port}`);
+httpServer.listen(httpPort, () => {
+    console.log(`HTTP Server started at ${httpPort}`);
 });
+
+httpsServer.listen(httpsPort, () => {
+    console.log(`HTTPS Server started at ${httpsPort}`);
+});
+
 /*
 HTTP Programming :
 
@@ -173,7 +192,11 @@ The View component is used for all the UI logic of the application. For example,
 Controllers act as an interface between Model and View components to process all the business logic and incoming requests, manipulate data using the Model component and interact with the Views to render the final output. For example, the Customer controller will handle all the interactions and inputs from the Customer View and update the database using the Customer Model. The same controller will be used to view the Customer data.
 
 
-
+HTTPS Server :
+    Diff between HTTP vs HTTPS Protocol 
+    What is the port number for HTTPS : 443
+    What is SSL/TLS Certificate ? 
+    What is DNS Server ? What is a TXT DNS Record ?
 
  / (App Main Directory)
 

@@ -4,12 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "PORT=8888 nodemon server.js",
+    "dev": "sudo nodemon server.js",
     "prod": "PORT=80 node server.js"
-    
   },
-  
-  "type":"module",
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
