@@ -1,116 +1,21 @@
 import http from "http";
 import https from "https";
-import url from "url";
+
 import fs from "fs";
 
+//Import the router
+import { HTTPServer, HTTPSServer } from "./controllers/index.js";
 const httpPort = process.env.PORT || 1234;
 const httpsPort = 443;
-
 
 const SSLOptions = {
     key: fs.readFileSync("utils/ssl-keys/private-key.pem"),
     cert: fs.readFileSync("utils/ssl-keys/certificate.pem")
 }
 
+const httpServer = http.createServer(HTTPServer);
+const httpsServer = https.createServer(SSLOptions, HTTPSServer);
 
-const httpServer = http.createServer(async (req, res) => {
-    try {
-        const parsedURL = url.parse(req.url, true);
-        const queryParams = parsedURL.query;
-        const method = req.method.toUpperCase();
-        const routeName = parsedURL.pathname;
-        console.log(method, routeName);
-        if (userRouter[method]) {
-            if (userRouter[method][routeName]) {
-                req.body = await bodyParser(req);
-                userRouter[method][routeName](req, res);
-            } else {
-                res.writeHead(404, { 'Content-Type': 'text/html' });
-                res.end("<h1> Not Found </h1>");
-            }
-        } else {
-            res.writeHead(405, { 'Content-Type': 'text/html' });
-            res.end("<h1> Invalid Method </h1>");
-        }
-    } catch (error) {
-        console.log(error);
-        res.writeHead(500, { 'Content-Type': 'text/html' });
-        res.end("<h1> Internal Server Error. Try Again </h1>");
-    }
-});
-
-const httpsServer = https.createServer(SSLOptions, (req, res) => {
-    res.writeHead(200, { 'Content-Type': "text/html" });
-    res.end("Hello All, this is HTTPS Server. Traffic is now encrypted.");
-});
-
-async function bodyParser(req) {
-    return new Promise((resolve, reject) => {
-        let body = '';
-        req.on("data", (chunk) => {
-            body += chunk;
-        });
-        req.on("end", () => {
-            body = (body) ? JSON.parse(body) : {};
-            resolve(body);
-        });
-        req.on("error", (error) => {
-            reject(error);
-        });
-    });
-}
-
-
-const userRouter = {
-    GET: {
-        "/": function (req, res) {
-            res.end("<h1>Hello World from GET Method from / </h1>");
-        },
-        "/hello": function (req, res) {
-            res.end("<h1>Hello World from GET Method from /hello </h1>");
-        },
-        "/about": function (req, res) {
-            res.end("<h1>Hello World from GET Method from /about </h1>");
-        }
-    },
-    POST: {
-        "/": function (req, res) {
-            console.log(req.body);
-            res.end("<h1>Hello World from POST Method from / </h1>");
-        },
-        "/hello": function (req, res) {
-            console.log(req.body);
-            res.end("<h1>Hello World from POST Method from /hello </h1>");
-        },
-        "/about": function (req, res) {
-            console.log(req.body);
-            res.end("<h1>Hello World from POST Method from /about </h1>");
-        }
-    },
-    PUT: {
-        "/": function (req, res) {
-            console.log(req.body);
-            res.end("<h1>Hello World from PUT Method from / </h1>");
-        },
-        "/hello": function (req, res) {
-            res.end("<h1>Hello World from PUT Method from /hello </h1>");
-        },
-        "/about": function (req, res) {
-            res.end("<h1>Hello World from PUT Method from /about </h1>");
-        }
-    },
-    DELETE: {
-        "/": function (req, res) {
-            res.end("<h1>Hello World from DELETE Method from / </h1>");
-        },
-        "/hello": function (req, res) {
-            res.end("<h1>Hello World from DELETE Method from /hello </h1>");
-        },
-        "/about": function (req, res) {
-            res.end("<h1>Hello World from DELETE Method from /about </h1>");
-        }
-    }
-}
 
 httpServer.listen(httpPort, () => {
     console.log(`HTTP Server started at ${httpPort}`);
