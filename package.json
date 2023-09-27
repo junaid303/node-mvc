@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "sudo nodemon server.js",
-    "prod": "pm2 start server.js --name foo.junaidkhan.info"
+    "prod": "pm2 start server.js --name foo.junaidkhan.info",
+    "dev": "sudo nodemon server.js"
+    
   },
   "type": "module",
   "keywords": [],
